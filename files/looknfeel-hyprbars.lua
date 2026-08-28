@@ -25,18 +25,20 @@ if hl.plugin and hl.plugin.hyprbars then
   })
 
   -- Rightmost first: close, then hide.
+  -- Hyprland 0.56: hyprctl dispatch is Lua (`hl.dsp.*`). Legacy names like
+  -- killactive / movetoworkspacesilent fail with a parse error.
   hl.plugin.hyprbars.add_button({
     bg_color = "rgb(f7768e)",
     fg_color = "rgb(1a1b26)",
     size = 12,
     icon = "",
-    action = "hyprctl dispatch killactive",
+    action = "hyprctl dispatch 'hl.dsp.window.close()'",
   })
   hl.plugin.hyprbars.add_button({
     bg_color = "rgb(e0af68)",
     fg_color = "rgb(1a1b26)",
     size = 12,
     icon = "",
-    action = "hyprctl dispatch movetoworkspacesilent special:scratchpad",
+    action = [[hyprctl dispatch 'hl.dsp.window.move({ workspace = "special:scratchpad", follow = false })']],
   })
 end

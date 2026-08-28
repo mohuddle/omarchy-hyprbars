@@ -2,7 +2,7 @@
 
 Notes from adding **server-side titlebars** (hide + close) to windows on [Omarchy](https://omarchy.org/) Linux **Quattro**, Hyprland **0.56.2**, Quickshell bar.
 
-Omarchy themes recolor borders, the shell, terminals, and wallpapers. They do **not** draw a titlebar. Hyprland itself has no titlebar either: a window is a 2px border. Close is `Super+W`. Hide is the **scratchpad** (`Super+Alt+S` / `Super+S`). There is no Windows-style minimize-to-taskbar.
+Omarchy themes recolor borders, the shell, terminals, and wallpapers. They do **not** draw a titlebar. Hyprland itself has no titlebar either: a window is a 2px border. Close is `Super+W`. Hide sends the window to the **scratchpad** (`Super+Alt+S`); `Super+S` toggles that overlay. There is no Windows-style minimize-to-taskbar.
 
 The compositor plugin that actually draws the chrome is [hyprbars](https://github.com/hyprwm/hyprland-plugins/tree/main/hyprbars). I worked through install, Lua config, and Tokyo Night colors with [Grok](https://x.ai/grok) in the Omarchy terminal.
 
@@ -15,8 +15,8 @@ A 22px bar on every window:
 | Control | Color | Action |
 | --- | --- | --- |
 | Title (left) | `#c0caf5` | Window title |
-| Hide (yellow) | `#e0af68` | Send window to `special:scratchpad`, stay on the current workspace |
-| Close (red) | `#f7768e` | Clean close (`killactive`, same as `Super+W`) |
+| Hide (yellow) | `#e0af68` | Send window to `special:scratchpad`, stay on the current workspace (`Super+Alt+S`) |
+| Close (red) | `#f7768e` | Clean close (`hl.dsp.window.close()`, same as `Super+W`) |
 
 Icons show on hover. Unfocused windows dim the buttons to `#414868`.
 
@@ -131,19 +131,19 @@ if hl.plugin and hl.plugin.hyprbars then
     fg_color = "rgb(1a1b26)",
     size = 12,
     icon = "",
-    action = "hyprctl dispatch killactive",
+    action = "hyprctl dispatch 'hl.dsp.window.close()'",
   })
   hl.plugin.hyprbars.add_button({
     bg_color = "rgb(e0af68)",
     fg_color = "rgb(1a1b26)",
     size = 12,
     icon = "",
-    action = "hyprctl dispatch movetoworkspacesilent special:scratchpad",
+    action = [[hyprctl dispatch 'hl.dsp.window.move({ workspace = "special:scratchpad", follow = false })']],
   })
 end
 ```
 
-`killactive` is Hyprland’s close dispatcher (xdg close request), not `SIGKILL`. Force-kill is `forcekillactive`.
+On Hyprland 0.56, `hyprctl dispatch` is a shorthand for `hl.dispatch(...)`. Legacy names (`killactive`, `movetoworkspacesilent`) fail with a Lua parse error. `hl.dsp.window.close()` is the xdg close request (same as `Super+W`), not `SIGKILL`.
 
 Scratchpad dispatchers already bound by Omarchy:
 
